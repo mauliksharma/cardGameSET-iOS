@@ -119,12 +119,12 @@ class ViewController: UIViewController {
                     button.layer.borderColor = nil
                 }
             }
-            else if game.keysWhereCardsNA.contains(index) {
-                button.setAttributedTitle(nil, for: UIControl.State.normal)
-                button.layer.borderWidth = 0
-                button.layer.borderColor = nil
-                button.layer.opacity = 0.0
-            }
+//            else if game.keysWhereCardsNA.contains(index) {
+//                button.setAttributedTitle(nil, for: UIControl.State.normal)
+//                button.layer.borderWidth = 0
+//                button.layer.borderColor = nil
+//                button.layer.opacity = 0.0
+//            }
             else {
                 button.setAttributedTitle(nil, for: UIControl.State.normal)
                 button.layer.borderWidth = 0
