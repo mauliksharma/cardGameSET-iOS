@@ -18,12 +18,11 @@ class Game {
     var loadedCards = [Card?]()
     
     init() {
-        for sym in 0...2 {
-            for num in 0...2 {
-                for col in 0...2 {
-                    for sha in 0...2 {
-                        
-                        let newCard = Card(symbol: sym, number: num, color: col, shade: sha, hashValue: Card.getUniqueHash())
+        for shape in 0...2 {
+            for number in 0...2 {
+                for color in 0...2 {
+                    for shade in 0...2 {
+                        let newCard = Card(shape: shape, number: number, color: color, shade: shade, hashValue: Card.getUniqueHash())
                         sortedDeck.append(newCard)
                     }
                 }
@@ -84,7 +83,7 @@ class Game {
                     if selectedCards.count == 2 {   //selecting 3rd card and testing for match
                         selectedCards.append(chosenCard)
                         for cardToMatch in selectedCards {
-                            symbolSet.insert(cardToMatch.symbol)
+                            symbolSet.insert(cardToMatch.shape)
                             numberSet.insert(cardToMatch.number)
                             colorSet.insert(cardToMatch.color)
                             shadeSet.insert(cardToMatch.shade)

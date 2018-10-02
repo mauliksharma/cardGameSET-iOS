@@ -9,7 +9,7 @@
 import Foundation
 
 struct Card: Hashable {
-    let symbol, number, color, shade: Int
+    let shape, number, color, shade: Int
     
     let hashValue: Int
     static var hashFactory = -1

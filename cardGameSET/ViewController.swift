@@ -39,66 +39,24 @@ class ViewController: UIViewController {
     
     var game = Game()
     
-    enum Feature {
-        case symbol(String)
-        case number(Int)
-        case color(UIColor)
-        case shade(Double?, CGFloat?)
-    }
-    
     let shapes = ["●", "■", "▲"]
-    let numbers = [1, 2, 3]
     let colors : [UIColor] = [.orange, .blue, .darkGray]
-    let shades: [(Double?, CGFloat?)] = [(8.0, nil), (nil, 1.0), (nil, 0.4)]
-    
-    var FeatureSpec: [String: Feature] = [
-        "Sym0" : .symbol("●"),
-        "Sym1" : .symbol("■"),
-        "Sym2" : .symbol("▲"),
-        "Num0" : .number(1),
-        "Num1" : .number(2),
-        "Num2" : .number(3),
-        "Col0" : .color(.orange),
-        "Col1" : .color(.blue),
-        "Col2" : .color(.darkGray),
-        "Sha0" : .shade(8.0, nil),
-        "Sha1" : .shade(nil, 1.0),
-        "Sha2" : .shade(nil, 0.4)
-    ]
     
     func loadCardTitle(_ card: Card) -> NSAttributedString {
-        var string = String()
+        let string = Array(repeating: shapes[card.shape], count: card.number + 1).joined(separator: "\n")
         var attributes = [NSAttributedString.Key : Any]()
-        var tempColorStorage: UIColor?
-        
-        func setFeatureValue(_ key: String) {
-            if let value = FeatureSpec[key] {
-                switch value {
-                case .symbol(let symbol):
-                    string = symbol
-                case .number(let number):
-                    string = Array(repeating: string, count: number).joined(separator: "\n")
-                case .color(let color):
-                    attributes[.foregroundColor] = color
-                    tempColorStorage = color
-                case .shade(let stroke, let alpha):
-                    if stroke != nil {
-                        attributes[.strokeWidth] = stroke
-                    }
-                    if alpha != nil {
-                        if let color = tempColorStorage {
-                            attributes[.foregroundColor] = color.withAlphaComponent(alpha!)
-                        }
-                    }
-                }
-            }
+        let color = colors[card.color]
+        switch card.shade {
+        case 0:
+            attributes[.strokeWidth] = 8.0
+            attributes[.strokeColor] = color
+        case 1:
+            attributes[.foregroundColor] = color.withAlphaComponent(0.4)
+        case 2:
+            attributes[.foregroundColor] = color.withAlphaComponent(1.0)
+        default:
+            break
         }
-        
-        setFeatureValue("Sym\(card.symbol)")
-        setFeatureValue("Num\(card.number)")
-        setFeatureValue("Col\(card.color)")
-        setFeatureValue("Sha\(card.shade)")
-        
         return NSAttributedString(string: string, attributes: attributes)
     }
     
