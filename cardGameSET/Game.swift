@@ -13,11 +13,14 @@ class Game {
     var sortedCardsCollection = [Card]()
     var randomCardsCollection = [Card]()
     
+    var score = 0
+    
     init() {
         for sym in 0...2 {
             for num in 0...2 {
                 for col in 0...2 {
                     for sha in 0...2 {
+                        
                         let newCard = Card(symbol: sym, number: num, color: col, shade: sha, hashValue: Card.getUniqueHash())
                         sortedCardsCollection.append(newCard)
                     }
@@ -65,13 +68,11 @@ class Game {
     }
     
     func replaceCards() {
-        for card in matchedCards {
-            if let key = loadedCardsDict.keys(forValue: card) { //refer extension below
-                loadNewCard(at: key)
-            }
+        let positionsToReplaceAt = loadedCardsDict.keys.filter(){ matchedCards.contains(loadedCardsDict[$0]!) }
+        for position in positionsToReplaceAt {
+            loadNewCard(at: position)
         }
     }
-    
     
     func deal3NewCards() {
         if !matchedCards.isEmpty {
@@ -90,7 +91,8 @@ class Game {
     
     func chooseCard(at key: Int) {
         if let cardToSelect = loadedCardsDict[key] {
-            if !matchedCards.contains(cardToSelect) || !keysWhereCardsNA.contains(key){
+            if !matchedCards.contains(cardToSelect) && !keysWhereCardsNA.contains(key){
+                
                 if !selectedCards.contains(cardToSelect) {  //selecting :-
                     if selectedCards.count == 2 {   //selecting 3rd card and testing for match
                         selectedCards.append(cardToSelect)
@@ -104,6 +106,10 @@ class Game {
                             for card in selectedCards {
                                 matchedCards.append(card)
                             }
+                            score += 3
+                        }
+                        else {
+                            score -= 5
                         }
                         clearSets()
                     }
@@ -119,23 +125,15 @@ class Game {
                         selectedCards.append(cardToSelect)
                     }
                 }
+                    
                 else {  //deselecting :-
                     if selectedCards.count < 3 {
                         selectedCards = selectedCards.filter(){$0 != cardToSelect}
+                        score -= 1
                     }
                 }
             }
         }
     }
     
-    
-    
 }
-
-extension Dictionary where Value : Equatable {
-    public func keys(forValue value: Value) -> Key? {
-        return keys.filter { self[$0] == value }.first
-    }
-}
-
-

@@ -22,6 +22,7 @@ class ViewController: UIViewController {
         if let cardButtonIndex =  cardButtons.index(of: sender) {
             game.chooseCard(at: cardButtonIndex)
             updateViewFromModel()
+            scoreLabel.text = String(game.score)
         }
     }
     
@@ -34,6 +35,7 @@ class ViewController: UIViewController {
     @IBAction func startAgain(_ sender: UIButton) {
         game = Game()
         updateViewFromModel()
+        scoreLabel.text = String(game.score)
     }
     
     var game = Game()
