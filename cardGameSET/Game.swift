@@ -10,10 +10,12 @@ import Foundation
 
 class Game {
     
-    var sortedCardsCollection = [Card]()
-    var randomCardsCollection = [Card]()
-    
     var score = 0
+    
+    var sortedDeck = [Card]()
+    var shuffledDeck = [Card]()
+    
+    var loadedCards = [Card?]()
     
     init() {
         for sym in 0...2 {
@@ -22,25 +24,21 @@ class Game {
                     for sha in 0...2 {
                         
                         let newCard = Card(symbol: sym, number: num, color: col, shade: sha, hashValue: Card.getUniqueHash())
-                        sortedCardsCollection.append(newCard)
+                        sortedDeck.append(newCard)
                     }
                 }
             }
         }
         
-        for _ in 0..<sortedCardsCollection.count {
-            let randomIndex = Int(arc4random_uniform(UInt32(sortedCardsCollection.count)))
-            randomCardsCollection.append(sortedCardsCollection.remove(at: randomIndex))
+        for _ in 0..<sortedDeck.count {
+            let randomIndex = Int(arc4random_uniform(UInt32(sortedDeck.count)))
+            shuffledDeck.append(sortedDeck.remove(at: randomIndex))
         }
         
-        for index in 0...11 {
-            loadNewCard(at: index)
+        for _ in 1...12 {
+            loadedCards.append(getNewCard()!)
         }
     }
-    
-    var loadedCardsDict = [Int: Card]()
-    var keysWhereCardsNA = [Int]()
-    var lastCardLoadedKey : Int = 11    //12 cards loaded with keys 0-11 on game creation
     
     var selectedCards = [Card]()
     var matchedCards = [Card]()
@@ -57,45 +55,34 @@ class Game {
         shadeSet.removeAll()
     }
     
-    func loadNewCard(at index: Int) {
-        if !randomCardsCollection.isEmpty {
-            loadedCardsDict[index] = randomCardsCollection.remove(at: 0)
-        }
-        else { //in case of no cards available for replacement
-            keysWhereCardsNA.append(index)
-            loadedCardsDict[index] = nil
-        }
+    func getNewCard() -> Card? {
+        return !shuffledDeck.isEmpty ? shuffledDeck.removeFirst() : nil
     }
     
     func replaceCards() {
-        let positionsToReplaceAt = loadedCardsDict.keys.filter(){ matchedCards.contains(loadedCardsDict[$0]!) }
-        for position in positionsToReplaceAt {
-            loadNewCard(at: position)
+        for matchedCard in matchedCards {
+            if let index = loadedCards.index(of: matchedCard) {
+                loadedCards[index] = getNewCard()
+            }
         }
+        matchedCards.removeAll()
     }
     
     func deal3NewCards() {
         if !matchedCards.isEmpty {
             replaceCards()
-            matchedCards.removeAll()
         }
-        else {
-            if lastCardLoadedKey < 24 { //should not exceed 24 cards at a time
-                for offset in 1...3 {
-                    loadNewCard(at: lastCardLoadedKey + offset)
-                }
-                lastCardLoadedKey += 3
-            }
+        else if loadedCards.count <= 21 && !shuffledDeck.isEmpty {
+            loadedCards.append(contentsOf: [getNewCard(), getNewCard(), getNewCard()])
         }
     }
     
-    func chooseCard(at key: Int) {
-        if let cardToSelect = loadedCardsDict[key] {
-            if !matchedCards.contains(cardToSelect) && !keysWhereCardsNA.contains(key){
-                
-                if !selectedCards.contains(cardToSelect) {  //selecting :-
+    func chooseCard(at index: Int) {
+        if let chosenCard = loadedCards[index] {
+            if !matchedCards.contains(chosenCard) {
+                if !selectedCards.contains(chosenCard) {  //selecting :-
                     if selectedCards.count == 2 {   //selecting 3rd card and testing for match
-                        selectedCards.append(cardToSelect)
+                        selectedCards.append(chosenCard)
                         for cardToMatch in selectedCards {
                             symbolSet.insert(cardToMatch.symbol)
                             numberSet.insert(cardToMatch.number)
@@ -116,19 +103,17 @@ class Game {
                     else if selectedCards.count == 3 {  //selecting fresh card after 3 cards tested for match
                         if !matchedCards.isEmpty {
                             replaceCards()
-                            matchedCards.removeAll()
                         }
-                        selectedCards = [cardToSelect]
+                        selectedCards = [chosenCard]
                         
                     }
                     else {  //if no card or 1 card is selected
-                        selectedCards.append(cardToSelect)
+                        selectedCards.append(chosenCard)
                     }
                 }
-                    
                 else {  //deselecting :-
                     if selectedCards.count < 3 {
-                        selectedCards = selectedCards.filter(){$0 != cardToSelect}
+                        selectedCards = selectedCards.filter(){$0 != chosenCard}
                         score -= 1
                     }
                 }

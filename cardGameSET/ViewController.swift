@@ -31,7 +31,6 @@ class ViewController: UIViewController {
         updateViewFromModel()
     }
     
-    
     @IBAction func startAgain(_ sender: UIButton) {
         game = Game()
         updateViewFromModel()
@@ -46,6 +45,11 @@ class ViewController: UIViewController {
         case color(UIColor)
         case shade(Double?, CGFloat?)
     }
+    
+    let shapes = ["●", "■", "▲"]
+    let numbers = [1, 2, 3]
+    let colors : [UIColor] = [.orange, .blue, .darkGray]
+    let shades: [(Double?, CGFloat?)] = [(8.0, nil), (nil, 1.0), (nil, 0.4)]
     
     var FeatureSpec: [String: Feature] = [
         "Sym0" : .symbol("●"),
@@ -66,9 +70,6 @@ class ViewController: UIViewController {
         var string = String()
         var attributes = [NSAttributedString.Key : Any]()
         var tempColorStorage: UIColor?
-        
-        var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = 0.7
         
         func setFeatureValue(_ key: String) {
             if let value = FeatureSpec[key] {
@@ -105,7 +106,7 @@ class ViewController: UIViewController {
         for index in cardButtons.indices {
             let button = cardButtons[index]
             button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-            if let card = game.loadedCardsDict[index] {
+            if game.loadedCards.indices.contains(index), let card = game.loadedCards[index] {
                 button.setAttributedTitle(loadCardTitle(card), for: UIControl.State.normal)
                 button.layer.opacity = 1.0
                 if game.matchedCards.contains(card) {
@@ -121,12 +122,6 @@ class ViewController: UIViewController {
                     button.layer.borderColor = nil
                 }
             }
-//            else if game.keysWhereCardsNA.contains(index) {
-//                button.setAttributedTitle(nil, for: UIControl.State.normal)
-//                button.layer.borderWidth = 0
-//                button.layer.borderColor = nil
-//                button.layer.opacity = 0.0
-//            }
             else {
                 button.setAttributedTitle(nil, for: UIControl.State.normal)
                 button.layer.borderWidth = 0
